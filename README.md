@@ -76,6 +76,9 @@ LovyanGFXでは、/usr/includeを探索して、SDLのファイルがあると�
 $ sudo apt remove libsdl2-dev
 ```
 
+![スクリーンショット 2024-05-20 103353](https://github.com/nnn112358/CoreMP135_LovyanGFX_test/assets/27625496/950f5a10-b390-4e03-bef1-925336e8caf3)
+
+
 ## 参考資料
 CM4Stack LGFX test program@tunefs
 https://github.com/tunefs/cm4stack_lgfxtest

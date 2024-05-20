@@ -70,12 +70,15 @@ make: *** [Makefile:91: all] Error 2
 
 ## 暫定回避策
 
-LovyanGFXでは、/usr/includeを探索して、SDLのファイルがあると参照してしまうようである。ビルドのために、いったん削除する。
+Ubuntuのlibsdl2-devパッケージは、/usr/include/SDL2にヘッダファイルをインストールする。
+LovyanGFXでは、/usr/includeを探索して、SDL2のファイルがあるとこれを参照しようとしてしまうようである。
+libsdl2-devパッケージは、クロスコンパイラには対応していないので、ビルド時にエラーとなる。
+今回は、ビルドのために、いったん削除する。
 
 ```
 $ sudo apt remove libsdl2-dev
 ```
- <img src="https://github.com/nnn112358/CoreMP135_LovyanGFX_test/assets/27625496/950f5a10-b390-4e03-bef1-925336e8caf3" width="50%" />
+ <img src="https://github.com/nnn112358/CoreMP135_LovyanGFX_test/assets/27625496/4ef50f31-ee8a-4b0c-9c24-54c6ffe0f536" width="50%" />
 
 
 ## 参考資料

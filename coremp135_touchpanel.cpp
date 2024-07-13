@@ -11,32 +11,35 @@
 #include <thread>
 #include <random>
 
-// �X�N���[���̕��ƍ������`���܂��B
+// スクリーンの幅と高さを定義します。
 #define SCREEN_WIDTH 320
 #define SCREEN_HEIGHT 240
-// �g�p����t���[���o�b�t�@�f�o�C�X�̃p�X���`���܂��B
+// 使用するフレームバッファデバイスのパスを定義します。
 #define FRAMEBUFFER_DEVICE "/dev/fb1"
-// �^�b�`�C�x���g����������f�o�C�X�̃p�X���`���܂��B
-#define TOUCH_EVENT_DEVICE "/dev/input/by-path/platform-4c004000.i2c-event"
-// �^�b�`�|�C���g�̔��a���`���܂��B
+// タッチイベントを処理するデバイスのパスを定義します。
+#define TOUCH_EVENT_DEVICE "/dev/input/event0"
+//以下でもタッチイベントアクセス可能
+//#define TOUCH_EVENT_DEVICE "/dev/input/by-path/platform-4c004000.i2c-event"
+
+// タッチポイントの半径を定義します。
 int TOUCH_POINT_RADIUS=5;
 
-// �f�B�X�v���C�̏����ݒ���s�����߂̃I�u�W�F�N�g���쐬���܂��B
+// ディスプレイの初期設定を行うためのオブジェクトを作成します。
 LGFX lcd(SCREEN_WIDTH, SCREEN_HEIGHT, FRAMEBUFFER_DEVICE);
-// �f�B�X�v���C��ő�����s�����߂̃X�v���C�g���쐬���܂��B
+// ディスプレイ上で操作を行うためのスプライトを作成します。
 static LGFX_Sprite lcdSprite(&lcd);
 
 int main() {
-    // �f�B�X�v���C�̏��������s���܂��B
+    // ディスプレイの初期化を行います。
     lcd.init();
-    // �f�B�X�v���C�̐F�[�x��16�r�b�g�ɐݒ肵�܂��B
+    // ディスプレイの色深度を16ビットに設定します。
     lcd.setColorDepth(16);
-    // �f�B�X�v���C���N���A���܂��B
+    // ディスプレイをクリアします。
     lcd.fillScreen(0);
-    // �e�L�X�g�̐F�𔒎��ɍ��w�i�Őݒ肵�܂��B
+    // テキストの色を白字に黒背景で設定します。
     lcd.setTextColor(TFT_WHITE, TFT_BLACK);
 
-    // �^�b�`�C�x���g�̃f�o�C�X�t�@�C����ǂݍ��ݐ�p�ŊJ���܂��B
+    // タッチイベントのデバイスファイルを読み込み専用で開きます。
     int inputFileDescriptor = open(TOUCH_EVENT_DEVICE, O_RDONLY);
     if (inputFileDescriptor < 0) {
         perror("Failed to open the input device");
@@ -47,24 +50,24 @@ int main() {
     int touchX = 0, touchY = 0;
 
     while (true) {
-        // �^�b�`�C�x���g���������������ǂݎ��܂��B
+        // タッチイベントが発生したら情報を読み取ります。
         if (read(inputFileDescriptor, &touchEvent, sizeof(touchEvent)) == sizeof(touchEvent)) {
             switch (touchEvent.type) {
                 case EV_KEY:
-                    // ����̃L�[�iMeta�L�[�j�������ꂽ�ꍇ�A�X�N���[�����N���A���܂��B
+                    // 特定のキー（Metaキー）が押された場合、スクリーンをクリアします。
                     if (touchEvent.code == KEY_LEFTMETA && touchEvent.value == 1) {
                         lcd.fillScreen(0);
                     }
                     break;
                 case EV_ABS:
-                    // X���W���X�V���ꂽ�ꍇ�A���̒l���X�V���܂��B
+                    // X座標が更新された場合、その値を更新します。
                     if (touchEvent.code == ABS_MT_POSITION_X) {
                         touchX = touchEvent.value;
                     } else if (touchEvent.code == ABS_MT_POSITION_Y) {
-                        // Y���W���X�V���ꂽ�ꍇ�A���̈ʒu�ɉ~��`�悵�܂��B
+                        // Y座標が更新された場合、その位置に円を描画します。
                         touchY = touchEvent.value;
-                        lcd.setColor(lcd.color888(255, 0, 0));  // �F��Ԃɐݒ肵�܂��B
-                        lcd.fillCircle(touchX, touchY, TOUCH_POINT_RADIUS);  // �^�b�`�|�C���g�ɉ~��`�悵�܂��B
+                        lcd.setColor(lcd.color888(255, 0, 0));  // 色を赤に設定します。
+                        lcd.fillCircle(touchX, touchY, TOUCH_POINT_RADIUS);  // タッチポイントに円を描画します。
                     }
                     break;
                 default:
@@ -72,7 +75,7 @@ int main() {
             }
         }
     }
-    // �C�x���g�������I�������f�o�C�X�t�@�C������܂��B
+    // イベント処理が終わったらデバイスファイルを閉じます。
     close(inputFileDescriptor);
     return 0;
 }
